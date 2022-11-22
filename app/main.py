@@ -1,17 +1,28 @@
 from fastapi import FastAPI
-from app.user import InputData
-import pickle
 import pandas as pd
+import pickle
+
+from app.user import InputData
 
 app = FastAPI()
 
-with open("app/model.pkl", "rb") as pickle_in:
-    model = pickle.load(pickle_in)
+model = pickle.load(
+    open('app/models/model.pkl', 'rb')
+)
+model_columns = pickle.load(
+    open('app/models/model_columns.pkl', 'rb')
+)
 
 
 @app.post("/predict")
-def predict_class(data: InputData):
-    data = data.dict()
-    test_data = pd.DataFrame([data])
-    predicted_class = model.predict(test_data)
-    return f"Participant belongs to class {'predicted'}"
+def predict_class(query: InputData):
+    query = query.dict()
+    query = pd.DataFrame([query])
+    query = pd.get_dummies(query)
+    query = query.reindex(
+        columns=model_columns,
+        fill_value=0
+    )
+    prediction = model.predict(query)
+
+    return f"Participant belongs to class {prediction}"
