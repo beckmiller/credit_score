@@ -20,7 +20,7 @@ def predict_class(clientData: InputData):
         open("app/models/model_columns.pkl", "rb")
     )
     clientDataEncoded = clientDataEncoded.reindex(
-        columns=model_columns, 
+        columns=model_columns,
         fill_value=0
     )
 
